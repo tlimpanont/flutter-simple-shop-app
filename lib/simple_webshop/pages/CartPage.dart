@@ -1,13 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/simple_webshop/blocs/ShoppingCartBloc.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartPage extends StatelessWidget {
   List<Widget> _getProductsListTile(context) {
-    final ShoppingCart _shoppingCart = ScopedModel.of<ShoppingCart>(context);
-    return _shoppingCart.products.map((product) {
+    final ShoppingCartBloc _shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
+
+    return (_shoppingCartBloc.currentState as ShoppingCartLoaded)
+        .products
+        .map((product) {
       return ListTile(
         onTap: () {},
         title: Text('${product.id}', style: Theme.of(context).textTheme.title),
@@ -22,7 +26,7 @@ class CartPage extends StatelessWidget {
               Scaffold.of(context).removeCurrentSnackBar();
               Scaffold.of(context).showSnackBar(
                   SnackBar(content: Text('Product: ${product.id} deleted')));
-              _shoppingCart.removeProduct(product);
+              _shoppingCartBloc.dispatch(RemoveProduct(product));
             }),
       );
     }).toList(growable: true);
@@ -30,7 +34,8 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ShoppingCart _shoppingCart = ScopedModel.of<ShoppingCart>(context);
+    final ShoppingCartBloc _shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
 
     var listViewChildren = _getProductsListTile(context);
     listViewChildren.add(ListTile(
@@ -48,7 +53,7 @@ class CartPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.subhead,
               ),
               Text(
-                '${currencyFormatter.format(_shoppingCart.totalPrice)}',
+                '${currencyFormatter.format((_shoppingCartBloc.currentState as ShoppingCartLoaded).totalPrice)}',
                 style: Theme.of(context).textTheme.title,
               )
             ],
@@ -57,7 +62,9 @@ class CartPage extends StatelessWidget {
       ),
     ));
 
-    return (_shoppingCart.products.isEmpty)
+    return ((_shoppingCartBloc.currentState as ShoppingCartLoaded)
+            .products
+            .isEmpty)
         ? Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

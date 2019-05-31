@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_app/simple_webshop/blocs/ShoppingCartBloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'pages/AddProductPage.dart';
 import 'pages/CartPage.dart';
 import 'pages/ProductsCataloguePage.dart';
 
 final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-ShoppingCart _shoppingCart = ShoppingCart();
 
 class SimpleWebShopApp extends StatelessWidget {
+  final ShoppingCartBloc _shoppingCartBloc = ShoppingCartBloc();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,13 +19,15 @@ class SimpleWebShopApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => ScopedModel<ShoppingCart>(
-              model: _shoppingCart,
-              child: WebShop(),
-            ),
+        '/': (context) {
+          return BlocProvider<ShoppingCartBloc>(
+              bloc: _shoppingCartBloc, child: WebShop());
+        },
         // When we navigate to the "/" route, build the FirstScreen Widget
-        '/addProduct': (context) => ScopedModel<ShoppingCart>(
-            model: _shoppingCart, child: AddProductPage()),
+        '/addProduct': (context) {
+          return BlocProvider<ShoppingCartBloc>(
+              bloc: _shoppingCartBloc, child: AddProductPage());
+        },
         // When we navigate to the "/second" route, build the SecondScreen Widget
       },
     );
@@ -45,8 +46,12 @@ class _WebShopState extends State<WebShop> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ShoppingCart>(
-      builder: (context, child, model) => Scaffold(
+    final ShoppingCartBloc _shoppingCartBloc =
+        BlocProvider.of<ShoppingCartBloc>(context);
+
+    return BlocBuilder<ShoppingCartEvent, ShoppingCartState>(
+      bloc: _shoppingCartBloc,
+      builder: (context, ShoppingCartState state) => Scaffold(
           key: scaffoldKey,
           appBar: AppBar(
             title: Text("My Simple Webshop"),
@@ -82,7 +87,7 @@ class _WebShopState extends State<WebShop> {
                           Positioned(
                               child: Container(
                                 child: Text(
-                                  '${model.products.length}',
+                                  '${(state as ShoppingCartLoaded).products.length}',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   textAlign: TextAlign.center,
