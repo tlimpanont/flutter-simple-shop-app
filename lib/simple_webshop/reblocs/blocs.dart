@@ -58,7 +58,7 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
             price: this.random.nextDouble() * 100,
             image: photo.url,
             title: faker.food.dish())));
-
+        await Future.delayed(Duration(milliseconds: 1500));
         context.dispatcher(ProductLoaded(products.sublist(0, 200)));
       }
     });
@@ -77,11 +77,16 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
   Stream<Accumulator<AppState>> applyReducer(
       Stream<Accumulator<AppState>> input) {
     return input.map((accumulator) {
-      if (accumulator.action is ProductLoaded) {
+      if (accumulator.action is FetchProducts) {
         return Accumulator(
-            accumulator.action,
-            accumulator.state.copyWith(
-                products: (accumulator.action as ProductLoaded).products));
+            accumulator.action, accumulator.state.copyWith(isLoading: true));
+      } else if (accumulator.action is ProductLoaded) {
+        return Accumulator(
+          accumulator.action,
+          accumulator.state.copyWith(
+              products: (accumulator.action as ProductLoaded).products,
+              isLoading: false),
+        );
       }
       return accumulator;
     });

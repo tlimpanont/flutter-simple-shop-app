@@ -1,13 +1,9 @@
-import 'dart:math';
-
+import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
 import 'package:flutter_app/simple_webshop/widgets/ProductCard.dart';
 import 'package:rebloc/rebloc.dart';
-import 'package:uuid/uuid.dart';
-import 'package:faker/faker.dart';
 
 var faker = new Faker();
 

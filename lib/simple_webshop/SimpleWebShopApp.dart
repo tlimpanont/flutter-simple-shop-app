@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
 import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
@@ -53,15 +52,23 @@ class _WebShopState extends State<WebShop> {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelSubscriber<AppState, ShoppingCart>(
-      converter: (AppState state) => state.shoppingCart,
-      builder: (context, dispatcher, ShoppingCart shoppingCart) => Scaffold(
-          key: scaffoldKey,
-          appBar: AppBar(
-            title: Text("My Simple Webshop"),
-          ),
-          bottomNavigationBar: Builder(builder: (BuildContext context) {
-            return BottomNavigationBar(
+    return ViewModelSubscriber<AppState, AppState>(
+      converter: (AppState state) => state,
+      builder: (context, dispatcher, AppState appState) => Scaffold(
+            key: scaffoldKey,
+            appBar: AppBar(
+              title: Text("My Simple Webshop"),
+            ),
+            body: (appState.isLoading)
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : PageView(
+                    onPageChanged: _onPageChange,
+                    controller: _pageController,
+                    children: <Widget>[ProductsCataloguePage(), CartPage()],
+                  ),
+            bottomNavigationBar: BottomNavigationBar(
                 currentIndex: _page,
                 onTap: (int page) async {
                   setState(() {
@@ -91,7 +98,7 @@ class _WebShopState extends State<WebShop> {
                           Positioned(
                               child: Container(
                                 child: Text(
-                                  '${shoppingCart.products.length}',
+                                  '${appState.shoppingCart.products.length}',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   textAlign: TextAlign.center,
@@ -107,13 +114,8 @@ class _WebShopState extends State<WebShop> {
                               right: 0)
                         ],
                       )),
-                ]);
-          }),
-          body: PageView(
-            onPageChanged: _onPageChange,
-            controller: _pageController,
-            children: <Widget>[ProductsCataloguePage(), CartPage()],
-          )),
+                ]),
+          ),
     );
   }
 
