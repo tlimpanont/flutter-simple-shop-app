@@ -18,7 +18,7 @@ class AddProductPage extends StatelessWidget {
       builder: (BuildContext context, dispatcher, ShoppingCart shoppingCart) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Product: ${product.id}'),
+            title: Text('Product: ${product.title}'),
           ),
           body: OrientationBuilder(
             builder: (context, orientation) {
@@ -83,6 +83,6 @@ class AddProductPage extends StatelessWidget {
     Navigator.pop(context, product);
     scaffoldKey.currentState.removeCurrentSnackBar();
     scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content: new Text("Product: ${product.id} added")));
+        new SnackBar(content: new Text("Product: ${product.title} added")));
   }
 }

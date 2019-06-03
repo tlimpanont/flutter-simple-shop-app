@@ -12,3 +12,11 @@ class RemoveProductFromCart extends Action {
 
   RemoveProductFromCart(this.product);
 }
+
+class FetchProducts extends Action {}
+
+class ProductLoaded extends Action {
+  final List<Product> products;
+
+  ProductLoaded(this.products);
+}

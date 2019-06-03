@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
+import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
 import 'package:rebloc/rebloc.dart';
@@ -9,13 +10,17 @@ import 'pages/CartPage.dart';
 import 'pages/ProductsCataloguePage.dart';
 
 final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+final Store<AppState> _store = Store<AppState>(
+    initialState: AppState.initialState(),
+    blocs: [ShoppingCartBloc(), ProductsCatalogueBloc()]);
 
 class SimpleWebShopApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    _store.dispatcher(FetchProducts());
+
     return StoreProvider<AppState>(
-        store: Store<AppState>(
-            initialState: AppState.initialState(), blocs: [ShoppingCartBloc()]),
+        store: _store,
         child: MaterialApp(
           title: "Simple WebShop App",
           theme: Theme.of(context).copyWith(

@@ -13,6 +13,14 @@ class Product extends Model {
 
   String get getPriceAsCurrency => currencyFormatter.format(price);
 
+  factory Product.fromJSON(Map<String, dynamic> parsedJSON) {
+    return Product(
+        price: parsedJSON['price'],
+        id: parsedJSON['id'],
+        image: parsedJSON['image'],
+        title: parsedJSON['title']);
+  }
+
   @override
   String toString() => 'Product model';
 }

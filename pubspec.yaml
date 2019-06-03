@@ -31,6 +31,8 @@ dependencies:
   flutter_bloc:
   meta:
   rebloc:
+  dio:
+  convert:
 
   flutter:
     sdk: flutter

@@ -18,6 +18,7 @@ class ProductCard extends StatelessWidget {
           children: <Widget>[
             Expanded(
                 child: CachedNetworkImage(
+              fit: BoxFit.cover,
               imageUrl: product.image,
             )),
             Container(

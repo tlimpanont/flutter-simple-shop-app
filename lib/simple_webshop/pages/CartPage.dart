@@ -13,7 +13,8 @@ class CartPage extends StatelessWidget {
     return products.map((Product product) {
       return ListTile(
         onTap: () {},
-        title: Text('${product.id}', style: Theme.of(context).textTheme.title),
+        title:
+            Text('${product.title}', style: Theme.of(context).textTheme.title),
         leading: CachedNetworkImage(imageUrl: product.image),
         subtitle: Text(
           '${product.getPriceAsCurrency}',
@@ -24,7 +25,7 @@ class CartPage extends StatelessWidget {
             onPressed: () {
               Scaffold.of(context).removeCurrentSnackBar();
               Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text('Product: ${product.id} deleted')));
+                  SnackBar(content: Text('Product: ${product.title} deleted')));
               dispatcher(RemoveProductFromCart(product));
             }),
       );
