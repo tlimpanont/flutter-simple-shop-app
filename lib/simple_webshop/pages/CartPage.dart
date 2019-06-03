@@ -1,17 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/blocs/ShoppingCartBloc.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
+import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
+import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:rebloc/rebloc.dart';
 
 class CartPage extends StatelessWidget {
-  List<Widget> _getProductsListTile(context) {
-    final ShoppingCartBloc _shoppingCartBloc =
-        BlocProvider.of<ShoppingCartBloc>(context);
+  List<Widget> _getProductsListTile(context, dispatcher, shoppingCart) {
+    final List<Product> products = shoppingCart.products;
 
-    return (_shoppingCartBloc.currentState as ShoppingCartLoaded)
-        .products
-        .map((product) {
+    return products.map((Product product) {
       return ListTile(
         onTap: () {},
         title: Text('${product.id}', style: Theme.of(context).textTheme.title),
@@ -26,18 +25,15 @@ class CartPage extends StatelessWidget {
               Scaffold.of(context).removeCurrentSnackBar();
               Scaffold.of(context).showSnackBar(
                   SnackBar(content: Text('Product: ${product.id} deleted')));
-              _shoppingCartBloc.dispatch(RemoveProduct(product));
+              dispatcher(RemoveProductFromCart(product));
             }),
       );
     }).toList(growable: true);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final ShoppingCartBloc _shoppingCartBloc =
-        BlocProvider.of<ShoppingCartBloc>(context);
-
-    var listViewChildren = _getProductsListTile(context);
+  List<Widget> _generateChildren(context, dispatcher, shoppingCart) {
+    var listViewChildren =
+        _getProductsListTile(context, dispatcher, shoppingCart);
     listViewChildren.add(ListTile(
       title: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -53,7 +49,7 @@ class CartPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.subhead,
               ),
               Text(
-                '${currencyFormatter.format((_shoppingCartBloc.currentState as ShoppingCartLoaded).totalPrice)}',
+                '${currencyFormatter.format(shoppingCart.totalPrice)}',
                 style: Theme.of(context).textTheme.title,
               )
             ],
@@ -61,39 +57,49 @@ class CartPage extends StatelessWidget {
         ),
       ),
     ));
+    return listViewChildren;
+  }
 
-    return ((_shoppingCartBloc.currentState as ShoppingCartLoaded)
-            .products
-            .isEmpty)
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundColor: Colors.grey[200],
-                  radius: 50,
-                  foregroundColor: Colors.grey[600],
-                  child: Icon(
-                    Icons.shopping_cart,
-                    size: 40,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ViewModelSubscriber<AppState, ShoppingCart>(
+        converter: (AppState state) => state.shoppingCart,
+        builder: (context, dispatcher, ShoppingCart shoppingCart) {
+          return (shoppingCart.products.isEmpty)
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      CircleAvatar(
+                        backgroundColor: Colors.grey[200],
+                        radius: 50,
+                        foregroundColor: Colors.grey[600],
+                        child: Icon(
+                          Icons.shopping_cart,
+                          size: 40,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'No products in cart',
+                        style: Theme.of(context).textTheme.subhead,
+                      )
+                    ],
                   ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'No products in cart',
-                  style: Theme.of(context).textTheme.subhead,
                 )
-              ],
-            ),
-          )
-        : Stack(
-            children: <Widget>[
-              ListView(
-                children: listViewChildren,
-              )
-            ],
-          );
+              : Stack(
+                  children: <Widget>[
+                    ListView(
+                      children:
+                          _generateChildren(context, dispatcher, shoppingCart),
+                    )
+                  ],
+                );
+        },
+      ),
+    );
   }
 }

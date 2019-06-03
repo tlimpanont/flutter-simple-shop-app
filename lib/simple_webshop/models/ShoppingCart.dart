@@ -2,21 +2,16 @@ import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ShoppingCart extends Model {
-  List<Product> _products = [];
+  List<Product> products;
 
-  List<Product> get products => _products;
+  double get totalPrice =>
+      products.fold(0, (double curr, Product product) => curr + product.price);
 
-  double get totalPrice => _products
-      .map((product) => product.price)
-      .fold(0, (curr, next) => curr + next);
+  ShoppingCart({this.products});
 
-  void addProduct(Product product) {
-    _products.add(product);
-    notifyListeners();
-  }
-
-  void removeProduct(Product product) {
-    _products.remove(product);
-    notifyListeners();
+  ShoppingCart copyWith({List<Product> products}) {
+    ShoppingCart shoppingCart =
+        new ShoppingCart(products: products ?? this.products);
+    return shoppingCart;
   }
 }

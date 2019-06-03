@@ -2,19 +2,20 @@ import 'package:baseplate/baseplate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
-import 'package:flutter_app/simple_webshop/blocs/ShoppingCartBloc.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
+import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
+import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:rebloc/rebloc.dart';
 
 class AddProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Product product = ModalRoute.of(context).settings.arguments;
-    final ShoppingCartBloc _shoppingCartBloc =
-        BlocProvider.of<ShoppingCartBloc>(context);
 
-    return BlocBuilder(
-      builder: (BuildContext context, ShoppingCartState state) {
+    return ViewModelSubscriber<AppState, ShoppingCart>(
+      converter: (AppState state) => state.shoppingCart,
+      builder: (BuildContext context, dispatcher, ShoppingCart shoppingCart) {
         return Scaffold(
           appBar: AppBar(
             title: Text('Product: ${product.id}'),
@@ -56,8 +57,7 @@ class AddProductPage extends StatelessWidget {
                             children: <Widget>[
                               RaisedButton(
                                 onPressed: () {
-                                  _shoppingCartBloc
-                                      .dispatch(AddProduct(product));
+                                  dispatcher(AddProductToCart(product));
                                   _navigateAndDisplayProduct(context, product);
                                 },
                                 child: Text('Add to cart'.toUpperCase()),
@@ -76,7 +76,6 @@ class AddProductPage extends StatelessWidget {
           ),
         );
       },
-      bloc: _shoppingCartBloc,
     );
   }
 

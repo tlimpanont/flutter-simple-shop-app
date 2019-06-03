@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/blocs/ShoppingCartBloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
+import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
+import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:rebloc/rebloc.dart';
 
 import 'pages/AddProductPage.dart';
 import 'pages/CartPage.dart';
@@ -9,28 +11,28 @@ import 'pages/ProductsCataloguePage.dart';
 final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class SimpleWebShopApp extends StatelessWidget {
-  final ShoppingCartBloc _shoppingCartBloc = ShoppingCartBloc();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Simple WebShop App",
-      theme: Theme.of(context).copyWith(
-          buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary)),
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) {
-          return BlocProvider<ShoppingCartBloc>(
-              bloc: _shoppingCartBloc, child: WebShop());
-        },
-        // When we navigate to the "/" route, build the FirstScreen Widget
-        '/addProduct': (context) {
-          return BlocProvider<ShoppingCartBloc>(
-              bloc: _shoppingCartBloc, child: AddProductPage());
-        },
-        // When we navigate to the "/second" route, build the SecondScreen Widget
-      },
-    );
+    return StoreProvider<AppState>(
+        store: Store<AppState>(
+            initialState: AppState.initialState(), blocs: [ShoppingCartBloc()]),
+        child: MaterialApp(
+          title: "Simple WebShop App",
+          theme: Theme.of(context).copyWith(
+              buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary)),
+          debugShowCheckedModeBanner: false,
+          initialRoute: '/',
+          routes: {
+            '/': (context) {
+              return WebShop();
+            },
+            // When we navigate to the "/" route, build the FirstScreen Widget
+            '/addProduct': (context) {
+              return AddProductPage();
+            },
+            // When we navigate to the "/second" route, build the SecondScreen Widget
+          },
+        ));
   }
 }
 
@@ -46,12 +48,9 @@ class _WebShopState extends State<WebShop> {
 
   @override
   Widget build(BuildContext context) {
-    final ShoppingCartBloc _shoppingCartBloc =
-        BlocProvider.of<ShoppingCartBloc>(context);
-
-    return BlocBuilder<ShoppingCartEvent, ShoppingCartState>(
-      bloc: _shoppingCartBloc,
-      builder: (context, ShoppingCartState state) => Scaffold(
+    return ViewModelSubscriber<AppState, ShoppingCart>(
+      converter: (AppState state) => state.shoppingCart,
+      builder: (context, dispatcher, ShoppingCart shoppingCart) => Scaffold(
           key: scaffoldKey,
           appBar: AppBar(
             title: Text("My Simple Webshop"),
@@ -87,7 +86,7 @@ class _WebShopState extends State<WebShop> {
                           Positioned(
                               child: Container(
                                 child: Text(
-                                  '${(state as ShoppingCartLoaded).products.length}',
+                                  '${shoppingCart.products.length}',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12),
                                   textAlign: TextAlign.center,

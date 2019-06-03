@@ -30,6 +30,7 @@ dependencies:
   bloc:
   flutter_bloc:
   meta:
+  rebloc:
 
   flutter:
     sdk: flutter
