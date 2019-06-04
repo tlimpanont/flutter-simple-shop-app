@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
 import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
@@ -20,22 +21,25 @@ class SimpleWebShopApp extends StatelessWidget {
 
     return StoreProvider<AppState>(
         store: _store,
-        child: MaterialApp(
-          title: "Simple WebShop App",
-          theme: Theme.of(context).copyWith(
-              buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary)),
-          debugShowCheckedModeBanner: false,
-          initialRoute: '/',
-          routes: {
-            '/': (context) {
-              return WebShop();
+        child: CustomGraphQLProvider(
+          child: MaterialApp(
+            title: "Simple WebShop App",
+            theme: Theme.of(context).copyWith(
+                buttonTheme:
+                    ButtonThemeData(textTheme: ButtonTextTheme.primary)),
+            debugShowCheckedModeBanner: false,
+            initialRoute: '/',
+            routes: {
+              '/': (context) {
+                return WebShop();
+              },
+              // When we navigate to the "/" route, build the FirstScreen Widget
+              '/addProduct': (context) {
+                return AddProductPage();
+              },
+              // When we navigate to the "/second" route, build the SecondScreen Widget
             },
-            // When we navigate to the "/" route, build the FirstScreen Widget
-            '/addProduct': (context) {
-              return AddProductPage();
-            },
-            // When we navigate to the "/second" route, build the SecondScreen Widget
-          },
+          ),
         ));
   }
 }

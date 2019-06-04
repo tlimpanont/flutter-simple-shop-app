@@ -20,3 +20,9 @@ class ProductLoaded extends Action {
 
   ProductLoaded(this.products);
 }
+
+class CreateProduct extends Action {
+  final Product product;
+
+  CreateProduct(this.product);
+}

@@ -2,10 +2,12 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:faker/faker.dart';
+import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
 import 'package:flutter_app/simple_webshop/models/Photo.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:rebloc/rebloc.dart';
 import 'package:uuid/uuid.dart';
 
@@ -39,27 +41,24 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
       Stream<WareContext<AppState>> input) {
     input.listen((context) async {
       if (context.action is FetchProducts) {
-        Response response =
-            await Dio().get('https://jsonplaceholder.typicode.com/photos');
+        QueryResult result =
+            await graphQLClient.query(QueryOptions(document: """
+            query {
+              allProducts {
+                id
+                image
+                price
+                title
+              }
+            } 
+          """));
 
-        final List<dynamic> mapped = response.data.map((item) {
-          return Photo(
-            albumId: item['albumId'],
-            id: item['id'],
-            url: item['url'],
-            thumbnailUrl: item['thumbnailUrl'],
-            title: item['title'],
-          );
+        final List<Product> products =
+            List<dynamic>.from(result.data['allProducts']).map((item) {
+          return Product.fromJSON(item);
         }).toList();
-
-        final photos = List<Photo>.from(mapped);
-        final products = List<Product>.from(photos.map((photo) => Product(
-            id: uuid.v4(),
-            price: this.random.nextDouble() * 100,
-            image: photo.url,
-            title: faker.food.dish())));
-        await Future.delayed(Duration(milliseconds: 1500));
-        context.dispatcher(ProductLoaded(products.sublist(0, 200)));
+        //await Future.delayed(Duration(milliseconds: 1500));
+        context.dispatcher(ProductLoaded(products));
       }
     });
 
@@ -77,7 +76,8 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
   Stream<Accumulator<AppState>> applyReducer(
       Stream<Accumulator<AppState>> input) {
     return input.map((accumulator) {
-      if (accumulator.action is FetchProducts) {
+      if ((accumulator.action is FetchProducts) ||
+          (accumulator.action is CreateProduct)) {
         return Accumulator(
             accumulator.action, accumulator.state.copyWith(isLoading: true));
       } else if (accumulator.action is ProductLoaded) {

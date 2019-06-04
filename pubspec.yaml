@@ -33,6 +33,7 @@ dependencies:
   rebloc:
   dio:
   convert:
+  graphql_flutter:
 
   flutter:
     sdk: flutter
