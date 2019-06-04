@@ -1,9 +1,7 @@
 import 'dart:math';
 
-import 'package:dio/dio.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
-import 'package:flutter_app/simple_webshop/models/Photo.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
@@ -19,7 +17,7 @@ class ShoppingCartBloc extends SimpleBloc<AppState> {
           shoppingCart: state.shoppingCart.copyWith(
               products: []
                 ..addAll(state.shoppingCart.products)
-                ..add(action.product)));
+                ..insert(0, action.product)));
     } else if (action is RemoveProductFromCart) {
       return state.copyWith(
           shoppingCart: state.shoppingCart.copyWith(
@@ -44,14 +42,14 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
         QueryResult result =
             await graphQLClient.query(QueryOptions(document: """
             query {
-              allProducts {
+              allProducts(orderBy: id_DESC) {
                 id
                 image
                 price
                 title
               }
             } 
-          """));
+          """, fetchPolicy: FetchPolicy.noCache));
 
         final List<Product> products =
             List<dynamic>.from(result.data['allProducts']).map((item) {
@@ -59,6 +57,30 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
         }).toList();
         //await Future.delayed(Duration(milliseconds: 1500));
         context.dispatcher(ProductLoaded(products));
+      } else if (context.action is CreateRandomProduct) {
+        final String dish = faker.food.dish();
+        final product = Product(
+            image: 'https://loremflickr.com/800/600/$dish',
+            title: dish,
+            price: random.nextDouble() * 100);
+
+        QueryResult result =
+            await graphQLClient.mutate(MutationOptions(document: """
+          mutation createProduct(\$image:String!, \$title:String!, \$price:Float!) {
+            createProduct(image:\$image, title:\$title, price:\$price) {
+              id
+              image
+              price
+              title
+            }
+          }
+        """, variables: {
+          "image": product.image,
+          "title": product.title,
+          "price": product.price,
+        }));
+
+        context.dispatcher(FetchProducts());
       }
     });
 
@@ -76,8 +98,7 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
   Stream<Accumulator<AppState>> applyReducer(
       Stream<Accumulator<AppState>> input) {
     return input.map((accumulator) {
-      if ((accumulator.action is FetchProducts) ||
-          (accumulator.action is CreateProduct)) {
+      if ((accumulator.action is FetchProducts)) {
         return Accumulator(
             accumulator.action, accumulator.state.copyWith(isLoading: true));
       } else if (accumulator.action is ProductLoaded) {

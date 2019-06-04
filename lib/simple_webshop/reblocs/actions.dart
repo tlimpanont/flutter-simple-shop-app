@@ -21,8 +21,8 @@ class ProductLoaded extends Action {
   ProductLoaded(this.products);
 }
 
-class CreateProduct extends Action {
+class CreateRandomProduct extends Action {
   final Product product;
 
-  CreateProduct(this.product);
+  CreateRandomProduct({this.product});
 }

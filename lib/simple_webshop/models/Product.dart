@@ -1,9 +1,8 @@
 import 'package:intl/intl.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 final currencyFormatter = new NumberFormat.simpleCurrency(locale: 'nl-NL');
 
-class Product extends Model {
+class Product {
   final String id;
   final String image;
   final String title;

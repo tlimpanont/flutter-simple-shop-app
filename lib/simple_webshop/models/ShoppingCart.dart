@@ -1,7 +1,6 @@
 import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:scoped_model/scoped_model.dart';
 
-class ShoppingCart extends Model {
+class ShoppingCart {
   List<Product> products;
 
   double get totalPrice =>
