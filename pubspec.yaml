@@ -29,6 +29,7 @@ dependencies:
   dio:
   convert:
   graphql_flutter:
+  shared_preferences:
 
   flutter:
     sdk: flutter

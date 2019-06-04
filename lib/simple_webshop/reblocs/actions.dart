@@ -1,4 +1,6 @@
 import 'package:flutter_app/simple_webshop/models/Product.dart';
+import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
+import 'package:meta/meta.dart';
 import 'package:rebloc/rebloc.dart';
 
 class AddProductToCart extends Action {
@@ -26,3 +28,25 @@ class CreateRandomProduct extends Action {
 
   CreateRandomProduct({this.product});
 }
+
+@immutable
+class UserIsAuthenticated extends Action {
+  final AuthenticatedUser user;
+
+  UserIsAuthenticated(this.user);
+}
+
+class UserIsUnAuthenticated extends Action {}
+
+@immutable
+class SingInUser extends Action {
+  final String email;
+  final String password;
+  SingInUser({@required this.email, @required this.password});
+}
+
+@immutable
+class SignOutUser extends Action {}
+
+@immutable
+class CheckIfUserIsAuthenticated extends Action {}
