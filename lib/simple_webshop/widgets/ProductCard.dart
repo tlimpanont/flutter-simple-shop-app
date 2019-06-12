@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
+import 'package:flutter_app/simple_webshop/pages/AddProductPage.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -11,7 +13,10 @@ class ProductCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/addProduct', arguments: product);
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => AddProductPage(
+                    product: product,
+                  )));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -6,11 +6,11 @@ import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
 import 'package:rebloc/rebloc.dart';
 
-import 'pages/AddProductPage.dart';
 import 'pages/CartPage.dart';
 import 'pages/ProductsCataloguePage.dart';
 
 final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+final GlobalKey<NavigatorState> navigationKey = new GlobalKey<NavigatorState>();
 final Store<AppState> _store = Store<AppState>(
     initialState: AppState.initialState(),
     blocs: [ProductsCatalogueBloc(), ShoppingCartBloc(), AuthenticationBloc()]);
@@ -21,23 +21,37 @@ class SimpleWebShopApp extends StatelessWidget {
     return StoreProvider<AppState>(
         store: _store,
         child: CustomGraphQLProvider(
-          child: MaterialApp(
-            title: "Simple WebShop App",
-            theme: Theme.of(context).copyWith(
-                buttonTheme:
-                    ButtonThemeData(textTheme: ButtonTextTheme.primary)),
-            debugShowCheckedModeBanner: false,
-            initialRoute: '/',
-            routes: {
-              '/': (context) {
-                return WebShop();
-              },
-              // When we navigate to the "/" route, build the FirstScreen Widget
-              '/addProduct': (context) {
-                return AddProductPage();
-              },
-              // When we navigate to the "/second" route, build the SecondScreen Widget
-            },
+          child: ViewModelSubscriber<AppState, AppState>(
+            converter: (AppState state) => state,
+            builder: (context, dispatcher, AppState appState) => MaterialApp(
+                  navigatorKey: navigationKey,
+                  title: "Simple WebShop App",
+                  theme: Theme.of(context).copyWith(
+                      buttonTheme:
+                          ButtonThemeData(textTheme: ButtonTextTheme.primary)),
+                  debugShowCheckedModeBanner: false,
+                  initialRoute: '/',
+                  onGenerateRoute: (RouteSettings settings) {
+                    print("User is authenticated ${appState.authenticated} ");
+                    switch (settings.name) {
+                      case '/':
+                        if (appState.authenticated) {
+                          return MaterialPageRoute(
+                              builder: (context) => WebShop());
+                        } else {
+                          return MaterialPageRoute(builder: (context) {
+                            return Scaffold(
+                              body: LoginPage(onSubmit: ({email, password}) {
+                                dispatcher(SingInUser(
+                                    email: email, password: password));
+                              }),
+                            );
+                          });
+                        }
+                        break;
+                    }
+                  },
+                ),
           ),
         ));
   }
@@ -126,14 +140,7 @@ class _WebShopState extends State<WebShop> {
                         child: CircularProgressIndicator(),
                       )
                     ]
-                  : (appState.authenticated)
-                      ? [ProductsCataloguePage(), CartPage()]
-                      : [
-                          LoginPage(onSubmit: ({email, password}) {
-                            dispatcher(
-                                SingInUser(email: email, password: password));
-                          }),
-                        ],
+                  : [ProductsCataloguePage(), CartPage()],
             ),
             bottomNavigationBar: (appState.authenticated)
                 ? BottomNavigationBar(

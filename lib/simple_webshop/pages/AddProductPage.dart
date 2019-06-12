@@ -9,10 +9,11 @@ import 'package:flutter_app/simple_webshop/reblocs/states.dart';
 import 'package:rebloc/rebloc.dart';
 
 class AddProductPage extends StatelessWidget {
+  final Product product;
+
+  const AddProductPage({Key key, this.product}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final Product product = ModalRoute.of(context).settings.arguments;
-
     return ViewModelSubscriber<AppState, ShoppingCart>(
       converter: (AppState state) => state.shoppingCart,
       builder: (BuildContext context, dispatcher, ShoppingCart shoppingCart) {

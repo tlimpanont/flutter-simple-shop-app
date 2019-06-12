@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:faker/faker.dart';
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
+import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
@@ -162,17 +164,15 @@ class AuthenticationBloc extends Bloc<AppState> {
 
         context.dispatcher(UserIsAuthenticated(user));
         context.dispatcher(FetchProducts());
+
+        Future.delayed(Duration(milliseconds: 100),
+            () => navigationKey.currentState.pushReplacementNamed('/'));
       } else if (context.action is SignOutUser) {
         await prefs.remove('user');
         context.dispatcher(UserIsUnAuthenticated());
-      } else if (context.action is CheckIfUserIsAuthenticated) {
-        final bool isAuthenticated = (prefs.getString('user') != null);
-
-        if (isAuthenticated) {
-          final AuthenticatedUser user =
-              AuthenticatedUser.fromJSON(jsonDecode(prefs.getString('user')));
-          context.dispatcher(UserIsAuthenticated(user));
-        }
+      } else if (context.action is UserIsUnAuthenticated) {
+        Future.delayed(Duration(milliseconds: 100),
+            () => navigationKey.currentState.pushReplacementNamed('/'));
       }
     });
     return input;
