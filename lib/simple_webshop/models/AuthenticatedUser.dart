@@ -4,7 +4,8 @@ class AuthenticatedUser {
   final String token;
   final String name;
 
-  AuthenticatedUser({this.id, this.email, this.token, this.name});
+  AuthenticatedUser(
+      {this.id = "", this.email = "", this.token = "", this.name = ""});
   factory AuthenticatedUser.fromJSON(Map<String, dynamic> parsedJSON) {
     return AuthenticatedUser(
         email: parsedJSON['email'],

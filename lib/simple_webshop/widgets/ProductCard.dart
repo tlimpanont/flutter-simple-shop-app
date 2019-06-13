@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/pages/AddProductPage.dart';
 

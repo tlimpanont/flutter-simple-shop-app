@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
 import 'package:flutter_app/simple_webshop/pages/LoginPage.dart';
 import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
-import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/store.dart';
+import 'package:flutter_app/simple_webshop/widgets/AppBottomNavigationBar.dart';
+import 'package:flutter_app/simple_webshop/widgets/AppDrawer.dart';
+import 'package:flutter_app/simple_webshop/widgets/Redirect.dart';
 import 'package:rebloc/rebloc.dart';
 
 import 'pages/CartPage.dart';
@@ -11,47 +14,40 @@ import 'pages/ProductsCataloguePage.dart';
 
 final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 final GlobalKey<NavigatorState> navigationKey = new GlobalKey<NavigatorState>();
-final Store<AppState> _store = Store<AppState>(
-    initialState: AppState.initialState(),
-    blocs: [ProductsCatalogueBloc(), ShoppingCartBloc(), AuthenticationBloc()]);
 
 class SimpleWebShopApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
-        store: _store,
+        store: store,
         child: CustomGraphQLProvider(
-          child: ViewModelSubscriber<AppState, AppState>(
-            converter: (AppState state) => state,
-            builder: (context, dispatcher, AppState appState) => MaterialApp(
-                  navigatorKey: navigationKey,
-                  title: "Simple WebShop App",
-                  theme: Theme.of(context).copyWith(
-                      buttonTheme:
-                          ButtonThemeData(textTheme: ButtonTextTheme.primary)),
-                  debugShowCheckedModeBanner: false,
-                  initialRoute: '/',
-                  onGenerateRoute: (RouteSettings settings) {
-                    print("User is authenticated ${appState.authenticated} ");
-                    switch (settings.name) {
-                      case '/':
-                        if (appState.authenticated) {
-                          return MaterialPageRoute(
-                              builder: (context) => WebShop());
-                        } else {
-                          return MaterialPageRoute(builder: (context) {
-                            return Scaffold(
-                              body: LoginPage(onSubmit: ({email, password}) {
-                                dispatcher(SingInUser(
-                                    email: email, password: password));
-                              }),
-                            );
-                          });
-                        }
-                        break;
-                    }
-                  },
-                ),
+          child: MaterialApp(
+            navigatorKey: navigationKey,
+            title: "Simple WebShop App",
+            theme: Theme.of(context).copyWith(
+                buttonTheme:
+                    ButtonThemeData(textTheme: ButtonTextTheme.primary)),
+            debugShowCheckedModeBanner: false,
+            initialRoute: '/',
+            onGenerateRoute: (RouteSettings settings) {
+              switch (settings.name) {
+                case '/':
+                  print("ROUTE ${settings.name} ");
+                  return MaterialPageRoute(builder: (context) => Redirect());
+                  break;
+                case '/shop':
+                  print("ROUTE ${settings.name} ");
+                  return MaterialPageRoute(builder: (context) => WebShop());
+                  break;
+                case '/login':
+                  print("ROUTE ${settings.name} ");
+                  return MaterialPageRoute(builder: (context) {
+                    return Scaffold(
+                      body: LoginPage(),
+                    );
+                  });
+              }
+            },
           ),
         ));
   }
@@ -62,6 +58,12 @@ class _WebShopState extends State<WebShop> {
   PageController _pageController = PageController();
 
   @override
+  void initState() {
+    store.dispatcher(FetchProducts());
+    super.initState();
+  }
+
+  @override
   void dispose() {
     // TODO: implement dispose
     _pageController.dispose();
@@ -70,130 +72,19 @@ class _WebShopState extends State<WebShop> {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelSubscriber<AppState, AppState>(
-      converter: (AppState state) => state,
-      builder: (context, dispatcher, AppState appState) => Scaffold(
-            key: scaffoldKey,
-            appBar: AppBar(
-              title: Text("My Simple Webshop"),
-            ),
-            endDrawer: (appState.authenticated)
-                ? Drawer(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        DrawerHeader(
-                          decoration: BoxDecoration(color: Colors.blue),
-                          child: SafeArea(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Flex(
-                                  direction: Axis.horizontal,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      child: Icon(
-                                        Icons.restaurant,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Text(
-                                  '${appState.user.name}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subhead
-                                      .copyWith(color: Colors.white),
-                                ),
-                                Text(
-                                  '${appState.user.email}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle
-                                      .copyWith(color: Colors.white),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        FlatButton(
-                          child: Text('Logout'),
-                          textColor: Colors.black,
-                          onPressed: () {
-                            scaffoldKey.currentState.removeCurrentSnackBar();
-                            Navigator.pop(context);
-                            dispatcher(SignOutUser());
-                          },
-                        )
-                      ],
-                    ),
-                  )
-                : null,
-            body: PageView(
-              onPageChanged: _onPageChange,
-              controller: _pageController,
-              children: (appState.isLoading)
-                  ? [
-                      Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    ]
-                  : [ProductsCataloguePage(), CartPage()],
-            ),
-            bottomNavigationBar: (appState.authenticated)
-                ? BottomNavigationBar(
-                    currentIndex: _page,
-                    onTap: (int page) async {
-                      setState(() {
-                        this._page = page;
-                      });
-
-                      await _pageController.animateToPage(page,
-                          duration: new Duration(milliseconds: 200),
-                          curve: Curves.ease);
-                    },
-                    items: [
-                        BottomNavigationBarItem(
-                          icon: Icon(
-                            Icons.photo_library,
-                            size: 32,
-                          ),
-                          title: Text(''),
-                        ),
-                        BottomNavigationBarItem(
-                            title: Text(''),
-                            icon: Stack(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.shopping_cart,
-                                  size: 32,
-                                ),
-                                Positioned(
-                                    child: Container(
-                                      child: Text(
-                                        '${appState.shoppingCart.products.length}',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      padding: EdgeInsets.all(1),
-                                      constraints: BoxConstraints(
-                                          minHeight: 16, minWidth: 16),
-                                      decoration: BoxDecoration(
-                                          color: Colors.redAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(6)),
-                                    ),
-                                    top: 0,
-                                    right: 0)
-                              ],
-                            )),
-                      ])
-                : null,
-          ),
-    );
+    return Scaffold(
+        key: scaffoldKey,
+        appBar: AppBar(
+          title: Text("My Simple Webshop"),
+        ),
+        endDrawer: AppDrawer(),
+        body: PageView(
+          onPageChanged: _onPageChange,
+          controller: _pageController,
+          children: [ProductsCataloguePage(), CartPage()],
+        ),
+        bottomNavigationBar: AppBottomNavigationBar(
+            pageController: _pageController, currentPage: _page));
   }
 
   void _onPageChange(int value) {

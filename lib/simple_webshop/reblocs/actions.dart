@@ -39,10 +39,10 @@ class UserIsAuthenticated extends Action {
 class UserIsUnAuthenticated extends Action {}
 
 @immutable
-class SingInUser extends Action {
+class SignInUser extends Action {
   final String email;
   final String password;
-  SingInUser({@required this.email, @required this.password});
+  SignInUser({@required this.email, @required this.password});
 }
 
 @immutable

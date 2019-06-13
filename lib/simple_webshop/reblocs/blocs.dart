@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:faker/faker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
 import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
@@ -103,7 +104,8 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
   Stream<Accumulator<AppState>> applyReducer(
       Stream<Accumulator<AppState>> input) {
     return input.map((accumulator) {
-      if ((accumulator.action is FetchProducts)) {
+      if ((accumulator.action is FetchProducts ||
+          accumulator.action is SignInUser)) {
         return Accumulator(
             accumulator.action, accumulator.state.copyWith(isLoading: true));
       } else if (accumulator.action is ProductLoaded) {
@@ -126,8 +128,8 @@ class AuthenticationBloc extends Bloc<AppState> {
     input.listen((context) async {
       final prefs = await SharedPreferences.getInstance();
 
-      if (context.action is SingInUser) {
-        final credentials = (context.action as SingInUser);
+      if (context.action is SignInUser) {
+        final credentials = (context.action as SignInUser);
         QueryResult result = await graphQLClient.query(QueryOptions(
             document: """
             mutation signinUser(\$email: String!, \$password:String!) {
@@ -163,16 +165,17 @@ class AuthenticationBloc extends Bloc<AppState> {
             }).toString());
 
         context.dispatcher(UserIsAuthenticated(user));
-        context.dispatcher(FetchProducts());
-
-        Future.delayed(Duration(milliseconds: 100),
-            () => navigationKey.currentState.pushReplacementNamed('/'));
+        Future.delayed(
+            Duration(milliseconds: 100),
+            () => navigationKey.currentState.pushNamedAndRemoveUntil(
+                '/shop', (Route<dynamic> route) => false));
       } else if (context.action is SignOutUser) {
         await prefs.remove('user');
         context.dispatcher(UserIsUnAuthenticated());
-      } else if (context.action is UserIsUnAuthenticated) {
-        Future.delayed(Duration(milliseconds: 100),
-            () => navigationKey.currentState.pushReplacementNamed('/'));
+        Future.delayed(
+            Duration(milliseconds: 100),
+            () => navigationKey.currentState.pushNamedAndRemoveUntil(
+                '/login', (Route<dynamic> route) => false));
       }
     });
     return input;
