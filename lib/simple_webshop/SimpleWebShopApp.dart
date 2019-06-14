@@ -12,7 +12,9 @@ import 'package:rebloc/rebloc.dart';
 import 'pages/CartPage.dart';
 import 'pages/ProductsCataloguePage.dart';
 
-final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> shopScaffoldKey = new GlobalKey<ScaffoldState>();
+final GlobalKey<ScaffoldState> loginPageScaffoldKey =
+    new GlobalKey<ScaffoldState>();
 final GlobalKey<NavigatorState> navigationKey = new GlobalKey<NavigatorState>();
 
 class SimpleWebShopApp extends StatelessWidget {
@@ -43,6 +45,7 @@ class SimpleWebShopApp extends StatelessWidget {
                   print("ROUTE ${settings.name} ");
                   return MaterialPageRoute(builder: (context) {
                     return Scaffold(
+                      key: loginPageScaffoldKey,
                       body: LoginPage(),
                     );
                   });
@@ -73,7 +76,7 @@ class _WebShopState extends State<WebShop> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: scaffoldKey,
+        key: shopScaffoldKey,
         appBar: AppBar(
           title: Text("My Simple Webshop"),
         ),

@@ -82,8 +82,8 @@ class AddProductPage extends StatelessWidget {
 
   void _navigateAndDisplayProduct(BuildContext context, Product product) async {
     Navigator.pop(context, product);
-    scaffoldKey.currentState.removeCurrentSnackBar();
-    scaffoldKey.currentState.showSnackBar(
+    shopScaffoldKey.currentState.removeCurrentSnackBar();
+    shopScaffoldKey.currentState.showSnackBar(
         new SnackBar(content: new Text("Product: ${product.title} added")));
   }
 }

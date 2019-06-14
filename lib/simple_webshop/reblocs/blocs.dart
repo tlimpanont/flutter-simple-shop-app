@@ -105,7 +105,8 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
       Stream<Accumulator<AppState>> input) {
     return input.map((accumulator) {
       if ((accumulator.action is FetchProducts ||
-          accumulator.action is SignInUser)) {
+          accumulator.action is SignInUser ||
+          accumulator.action is UserIsUnAuthenticated)) {
         return Accumulator(
             accumulator.action, accumulator.state.copyWith(isLoading: true));
       } else if (accumulator.action is ProductLoaded) {
@@ -148,27 +149,33 @@ class AuthenticationBloc extends Bloc<AppState> {
               'email': credentials.email,
               'password': credentials.password,
             }));
+        if (result.data != null) {
+          final user = AuthenticatedUser(
+              token: result.data['signinUser']['token'],
+              id: result.data['signinUser']['user']['id'],
+              email: result.data['signinUser']['user']['email'],
+              name: result.data['signinUser']['user']['name']);
 
-        final user = AuthenticatedUser(
-            token: result.data['signinUser']['token'],
-            id: result.data['signinUser']['user']['id'],
-            email: result.data['signinUser']['user']['email'],
-            name: result.data['signinUser']['user']['name']);
+          prefs.setString(
+              'user',
+              jsonEncode({
+                "token": user.token.toString(),
+                "id": user.id.toString(),
+                "email": user.email.toString(),
+                "name": user.name.toString(),
+              }).toString());
 
-        prefs.setString(
-            'user',
-            jsonEncode({
-              "token": user.token.toString(),
-              "id": user.id.toString(),
-              "email": user.email.toString(),
-              "name": user.name.toString(),
-            }).toString());
-
-        context.dispatcher(UserIsAuthenticated(user));
-        Future.delayed(
-            Duration(milliseconds: 100),
-            () => navigationKey.currentState.pushNamedAndRemoveUntil(
-                '/shop', (Route<dynamic> route) => false));
+          context.dispatcher(UserIsAuthenticated(user));
+          Future.delayed(
+              Duration(milliseconds: 100),
+              () => navigationKey.currentState.pushNamedAndRemoveUntil(
+                  '/shop', (Route<dynamic> route) => false));
+        } else {
+          loginPageScaffoldKey.currentState.showSnackBar(SnackBar(
+              content:
+                  Text('Authentication error ${result.errors[0].message}')));
+          context.dispatcher(UserIsUnAuthenticated());
+        }
       } else if (context.action is SignOutUser) {
         await prefs.remove('user');
         context.dispatcher(UserIsUnAuthenticated());
