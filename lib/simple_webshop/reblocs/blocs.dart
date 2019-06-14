@@ -57,12 +57,18 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
             } 
           """, fetchPolicy: FetchPolicy.noCache));
 
-        final List<Product> products =
-            List<dynamic>.from(result.data['allProducts']).map((item) {
-          return Product.fromJSON(item);
-        }).toList();
-        //await Future.delayed(Duration(milliseconds: 1500));
-        context.dispatcher(ProductLoaded(products));
+        if (result.data != null) {
+          final List<Product> products =
+              List<dynamic>.from(result.data['allProducts']).map((item) {
+            return Product.fromJSON(item);
+          }).toList();
+          //await Future.delayed(Duration(milliseconds: 1500));
+          context.dispatcher(ProductLoaded(products));
+        } else {
+          shopScaffoldKey.currentState.removeCurrentSnackBar();
+          shopScaffoldKey.currentState.showSnackBar(
+              SnackBar(content: Text('${result.errors[0].message}')));
+        }
       } else if (context.action is CreateRandomProduct) {
         final String dish = faker.food.dish();
         final product = Product(
@@ -171,6 +177,7 @@ class AuthenticationBloc extends Bloc<AppState> {
               () => navigationKey.currentState.pushNamedAndRemoveUntil(
                   '/shop', (Route<dynamic> route) => false));
         } else {
+          loginPageScaffoldKey.currentState.removeCurrentSnackBar();
           loginPageScaffoldKey.currentState.showSnackBar(SnackBar(
               content:
                   Text('Authentication error ${result.errors[0].message}')));

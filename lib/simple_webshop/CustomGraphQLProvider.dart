@@ -9,20 +9,13 @@ final HttpLink _httpLink = HttpLink(
   uri: 'https://api.graph.cool/simple/v1/cjwgpfmwi49h4018345iwgiks',
 );
 
-final AuthLink _authLink = AuthLink(
-  //getToken: () async => 'Bearer <YOUR_PERSONAL_ACCESS_TOKEN>'
-  getToken: () async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = (prefs.get('user') != null)
-        ? 'Bearer ${AuthenticatedUser.fromJSON(jsonDecode(prefs.get('user'))).token}'
-        : '';
-    return token;
-//    return token;
-//    return 'Bearer ${user.token}';
-  },
-  // OR
-  // getToken: () => 'Bearer <YOUR_PERSONAL_ACCESS_TOKEN>',
-);
+final AuthLink _authLink = AuthLink(getToken: () async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = (prefs.get('user') != null)
+      ? 'Bearer ${AuthenticatedUser.fromJSON(jsonDecode(prefs.get('user'))).token}'
+      : '';
+  return token;
+});
 
 final Link _link = _authLink.concat(_httpLink);
 
