@@ -9,10 +9,37 @@ class AddProductToCart extends Action {
   AddProductToCart(this.product);
 }
 
+class PersistAddProductToCart extends Action {
+  final String productId;
+  final String shoppingCartId;
+
+  PersistAddProductToCart({this.productId, this.shoppingCartId});
+}
+
+class PersistRemoveProductFromCart extends Action {
+  final String productId;
+  final String shoppingCartId;
+
+  PersistRemoveProductFromCart({this.productId, this.shoppingCartId});
+}
+
 class RemoveProductFromCart extends Action {
   final Product product;
 
   RemoveProductFromCart(this.product);
+}
+
+class SetShoppingCart extends Action {
+  final String shoppingCartId;
+  final List<Product> products;
+
+  SetShoppingCart({this.shoppingCartId, this.products});
+}
+
+class FetchShoppingCartProducts extends Action {
+  final String userId;
+
+  FetchShoppingCartProducts(this.userId);
 }
 
 class FetchProducts extends Action {}

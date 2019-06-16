@@ -15,10 +15,119 @@ import 'package:rebloc/rebloc.dart';
 import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class ShoppingCartGraphqlBloc extends Bloc<AppState> {
+  @override
+  Stream<WareContext<AppState>> applyAfterware(
+      Stream<WareContext<AppState>> input) {
+    input.listen((context) async {
+      if (context.action is FetchShoppingCartProducts) {
+        final result = await graphQLClient.query(QueryOptions(
+            document: """
+                    query allUsers(\$userId:ID!) {
+                        allUsers(filter:{id:\$userId}) {
+                          shoppingCart {
+                            id
+                            products {
+                              id
+                              image
+                              price
+                              title
+                            }
+                          }
+                        }
+                      }
+                  """,
+            fetchPolicy: FetchPolicy.noCache,
+            variables: {
+              "userId": (context.action as FetchShoppingCartProducts).userId,
+            }));
+
+        final List<dynamic> _products =
+            result.data['allUsers'][0]['shoppingCart']['products'];
+
+        final products =
+            _products.map((product) => Product.fromJSON(product)).toList();
+
+        final shoppingCartId = result.data['allUsers'][0]['shoppingCart']['id'];
+
+        context.dispatcher(SetShoppingCart(
+            products: products, shoppingCartId: shoppingCartId));
+      } else if (context.action is PersistAddProductToCart) {
+        final String productId =
+            (context.action as PersistAddProductToCart).productId;
+        await graphQLClient.mutate(MutationOptions(
+            document: """
+                    mutation addToShoppingCartOnProduct(\$productId:ID!, \$shoppingCartId:ID! ) {
+                      addToShoppingCartOnProduct(productsProductId: \$productId, shoppingCartsShoppingCartId: \$shoppingCartId) {
+                        productsProduct {
+                          id
+                          image
+                        }
+                      }
+                    }
+                  """,
+            fetchPolicy: FetchPolicy.noCache,
+            variables: {
+              "productId": productId,
+              "shoppingCartId":
+                  (context.action as PersistAddProductToCart).shoppingCartId
+            }));
+
+        context.dispatcher(AddProductToCart(context.state.products
+            .firstWhere((product) => product.id == productId)));
+      } else if (context.action is PersistRemoveProductFromCart) {
+        final String productId =
+            (context.action as PersistRemoveProductFromCart).productId;
+        await graphQLClient.mutate(MutationOptions(
+            document: """
+                    mutation removeFromShoppingCartOnProduct(\$productId: ID!, \$shoppingCartId: ID!) {
+                      removeFromShoppingCartOnProduct(productsProductId: \$productId, shoppingCartsShoppingCartId: \$shoppingCartId) {
+                        productsProduct {
+                          id
+                          image
+                        }
+                      }
+                    }
+
+                  """,
+            fetchPolicy: FetchPolicy.noCache,
+            variables: {
+              "productId": productId,
+              "shoppingCartId": (context.action as PersistRemoveProductFromCart)
+                  .shoppingCartId
+            }));
+        final removingProduct = context.state.products
+            .firstWhere((product) => product.id == productId);
+
+        context.dispatcher(RemoveProductFromCart(removingProduct));
+      }
+    });
+    return input;
+  }
+
+  @override
+  Stream<WareContext<AppState>> applyMiddleware(
+      Stream<WareContext<AppState>> input) {
+    return input;
+  }
+
+  @override
+  Stream<Accumulator<AppState>> applyReducer(
+      Stream<Accumulator<AppState>> input) {
+    return input.map((Accumulator<AppState> accumulator) {
+      return accumulator;
+    });
+  }
+}
+
 class ShoppingCartBloc extends SimpleBloc<AppState> {
   @override
   AppState reducer(AppState state, action) {
-    if (action is AddProductToCart) {
+    if (action is SetShoppingCart) {
+      return state.copyWith(
+          shoppingCart: state.shoppingCart
+              .copyWith(id: action.shoppingCartId, products: action.products));
+    } else if (action is AddProductToCart) {
       return state.copyWith(
           shoppingCart: state.shoppingCart.copyWith(
               products: []
@@ -29,7 +138,7 @@ class ShoppingCartBloc extends SimpleBloc<AppState> {
           shoppingCart: state.shoppingCart.copyWith(
               products: []
                 ..addAll(state.shoppingCart.products)
-                ..remove(action.product)));
+                ..removeWhere((product) => product.id == action.product.id)));
     }
     return state;
   }
@@ -76,8 +185,8 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
             title: dish,
             price: random.nextDouble() * 100);
 
-        QueryResult result =
-            await graphQLClient.mutate(MutationOptions(document: """
+        await graphQLClient.mutate(MutationOptions(
+            document: """
           mutation createProduct(\$image:String!, \$title:String!, \$price:Float!) {
             createProduct(image:\$image, title:\$title, price:\$price) {
               id
@@ -86,11 +195,17 @@ class ProductsCatalogueBloc extends Bloc<AppState> {
               title
             }
           }
-        """, variables: {
-          "image": product.image,
-          "title": product.title,
-          "price": product.price,
-        }));
+        """,
+            fetchPolicy: FetchPolicy.noCache,
+            variables: {
+              "image": product.image,
+              "title": product.title,
+              "price": product.price,
+            }));
+
+        shopScaffoldKey.currentState.removeCurrentSnackBar();
+        shopScaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text('${product.title} added to the list')));
 
         context.dispatcher(FetchProducts());
       }
@@ -146,6 +261,9 @@ class AuthenticationBloc extends Bloc<AppState> {
                   id
                   email
                   name
+                  shoppingCart {
+                    id
+                  }
                 }
               }
             }
@@ -160,7 +278,28 @@ class AuthenticationBloc extends Bloc<AppState> {
               token: result.data['signinUser']['token'],
               id: result.data['signinUser']['user']['id'],
               email: result.data['signinUser']['user']['email'],
-              name: result.data['signinUser']['user']['name']);
+              name: result.data['signinUser']['user']['name'],
+              shoppingCartId: result.data['signinUser']['user']['shoppingCart']
+                  ['id']);
+
+          final shoppingCart =
+              result.data['signinUser']['user']['shoppingCart'];
+
+          if (shoppingCart != null) {
+            context.dispatcher(FetchShoppingCartProducts(user.id));
+          } else {
+            await graphQLClient.query(QueryOptions(
+                document: """
+            mutation createShoppingCart(\$userId:ID!) {
+              createShoppingCart(userId: \$userId) {
+                id 
+              }
+            }
+          """,
+                fetchPolicy: FetchPolicy.noCache,
+                variables: {'userId': user.id}));
+            context.dispatcher(FetchShoppingCartProducts(user.id));
+          }
 
           prefs.setString(
               'user',
@@ -169,6 +308,7 @@ class AuthenticationBloc extends Bloc<AppState> {
                 "id": user.id.toString(),
                 "email": user.email.toString(),
                 "name": user.name.toString(),
+                "shoppingCartId": user.shoppingCartId.toString(),
               }).toString());
 
           context.dispatcher(UserIsAuthenticated(user));

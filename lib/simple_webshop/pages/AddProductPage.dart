@@ -58,7 +58,9 @@ class AddProductPage extends StatelessWidget {
                             children: <Widget>[
                               RaisedButton(
                                 onPressed: () {
-                                  dispatcher(AddProductToCart(product));
+                                  dispatcher(PersistAddProductToCart(
+                                      productId: product.id,
+                                      shoppingCartId: shoppingCart.id));
                                   _navigateAndDisplayProduct(context, product);
                                 },
                                 child: Text('Add to cart'.toUpperCase()),

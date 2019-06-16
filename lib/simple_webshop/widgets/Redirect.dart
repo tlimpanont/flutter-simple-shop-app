@@ -36,6 +36,9 @@ class _RedirectState extends State<Redirect> {
 
       if (user is AuthenticatedUser) {
         store.dispatcher(UserIsAuthenticated(user));
+
+        store.dispatcher(FetchShoppingCartProducts(user.id));
+
         Navigator.of(context).pushReplacementNamed("/shop");
       } else {
         Navigator.of(context).pushReplacementNamed("/login");
