@@ -15,7 +15,7 @@ class AddProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelSubscriber<AppState, ShoppingCart>(
-      converter: (AppState state) => state.shoppingCart,
+      converter: (AppState state) => state.user.shoppingCart,
       builder: (BuildContext context, dispatcher, ShoppingCart shoppingCart) {
         return Scaffold(
           appBar: AppBar(
@@ -59,8 +59,8 @@ class AddProductPage extends StatelessWidget {
                               RaisedButton(
                                 onPressed: () {
                                   dispatcher(PersistAddProductToCart(
-                                      productId: product.id,
-                                      shoppingCartId: shoppingCart.id));
+                                      shoppingCartId: shoppingCart.id,
+                                      productId: product.id));
                                   _navigateAndDisplayProduct(context, product);
                                 },
                                 child: Text('Add to cart'.toUpperCase()),

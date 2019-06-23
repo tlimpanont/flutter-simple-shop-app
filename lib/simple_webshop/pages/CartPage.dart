@@ -12,9 +12,9 @@ class CartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: ViewModelSubscriber<AppState, ShoppingCart>(
-        converter: (AppState state) => state.shoppingCart,
+        converter: (AppState state) => state.user.shoppingCart,
         builder: (context, dispatcher, ShoppingCart shoppingCart) {
-          return (shoppingCart.products.isEmpty)
+          return (shoppingCart.cartProducts.isEmpty)
               ? EmptyStateIconLabel(
                   labelText: "No items in cart",
                   iconData: Icons.shopping_cart,

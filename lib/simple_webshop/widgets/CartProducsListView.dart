@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
 
@@ -11,24 +12,25 @@ class CartProductsListView extends StatelessWidget {
   CartProductsListView(
       {@required this.shoppingCart, @required this.onDeleteItem});
   List<Widget> _getProductsListTile(
-      BuildContext context, List<Product> products) {
-    return products.map((Product product) {
+      BuildContext context, List<CartProduct> cartProducts) {
+    return cartProducts.map((CartProduct cartProduct) {
       return ListTile(
         onTap: () {},
-        title:
-            Text('${product.title}', style: Theme.of(context).textTheme.title),
-        leading: CachedNetworkImage(imageUrl: product.image),
+        title: Text('${cartProduct.product.title}',
+            style: Theme.of(context).textTheme.title),
+        leading: CachedNetworkImage(imageUrl: cartProduct.product.image),
         subtitle: Text(
-          '${product.getPriceAsCurrency}',
+          '${cartProduct.product.getPriceAsCurrency}',
           style: Theme.of(context).textTheme.subtitle,
         ),
         trailing: IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
               Scaffold.of(context).removeCurrentSnackBar();
-              Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text('Product: ${product.title} deleted')));
-              onDeleteItem(product);
+              Scaffold.of(context).showSnackBar(SnackBar(
+                  content:
+                      Text('Product: ${cartProduct.product.title} deleted')));
+              onDeleteItem(cartProduct.product);
             }),
       );
     }).toList(growable: true);
@@ -36,7 +38,8 @@ class CartProductsListView extends StatelessWidget {
 
   List<Widget> _generateChildren(
       BuildContext context, ShoppingCart shoppingCart) {
-    var listViewChildren = _getProductsListTile(context, shoppingCart.products);
+    var listViewChildren =
+        _getProductsListTile(context, shoppingCart.cartProducts.toList());
     listViewChildren.add(ListTile(
       title: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),

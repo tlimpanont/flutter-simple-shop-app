@@ -1,17 +1,39 @@
-import 'package:flutter_app/simple_webshop/models/Product.dart';
+import 'dart:convert';
 
-class ShoppingCart {
-  final List<Product> products;
-  final String id;
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
+import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
+import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
+import 'package:flutter_app/simple_webshop/serializers.dart';
 
-  double get totalPrice =>
-      products.fold(0, (double curr, Product product) => curr + product.price);
+part 'ShoppingCart.g.dart';
 
-  ShoppingCart({this.products, this.id});
+abstract class ShoppingCart
+    implements Built<ShoppingCart, ShoppingCartBuilder> {
+  @nullable
+  String get id;
+  @nullable
+  BuiltList<CartProduct> get cartProducts;
 
-  ShoppingCart copyWith({List<Product> products, String id}) {
-    ShoppingCart shoppingCart = new ShoppingCart(
-        products: products ?? this.products, id: id ?? this.id);
-    return shoppingCart;
+  @nullable
+  double get totalPrice => cartProducts.fold(
+      0,
+      (double curr, CartProduct cartProduct) =>
+          curr + cartProduct.product.price);
+
+  static Serializer<ShoppingCart> get serializer => _$shoppingCartSerializer;
+
+  ShoppingCart._();
+  factory ShoppingCart([void Function(ShoppingCartBuilder) updates]) =
+      _$ShoppingCart;
+
+  static ShoppingCart fromJson(String jsonString) {
+    return serializers.deserializeWith(
+        ShoppingCart.serializer, jsonDecode(jsonString));
+  }
+
+  String toJson() {
+    return jsonEncode(serializers.serializeWith(ShoppingCart.serializer, this));
   }
 }

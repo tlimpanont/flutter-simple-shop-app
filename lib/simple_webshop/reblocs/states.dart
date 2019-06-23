@@ -1,42 +1,40 @@
-import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
+import 'dart:convert';
+
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter_app/simple_webshop/models/Product.dart';
+import 'package:flutter_app/simple_webshop/serializers.dart';
 
-@immutable
-class AppState {
-  final ShoppingCart shoppingCart;
-  final List<Product> products;
-  final bool isLoading;
-  final bool authenticated;
-  final AuthenticatedUser user;
+part 'states.g.dart';
 
-  AppState(
-      {this.shoppingCart,
-      this.products,
-      this.isLoading,
-      this.user,
-      this.authenticated});
+abstract class AppState implements Built<AppState, AppStateBuilder> {
+  BuiltList<Product> get products;
+  bool get isLoading;
+  bool get authenticated;
+  @nullable
+  AuthenticatedUser get user;
 
-  AppState.initialState()
-      : shoppingCart = ShoppingCart(products: []),
-        products = [],
-        isLoading = false,
-        authenticated = false,
-        user = null;
+  static Serializer<AppState> get serializer => _$appStateSerializer;
 
-  AppState copyWith(
-      {ShoppingCart shoppingCart,
-      List<Product> products,
-      bool isLoading,
-      bool authenticated,
-      AuthenticatedUser user}) {
-    return AppState(
-      shoppingCart: shoppingCart ?? this.shoppingCart,
-      products: products ?? this.products,
-      isLoading: isLoading ?? this.isLoading,
-      authenticated: authenticated ?? this.authenticated,
-      user: user ?? this.user,
-    );
+  static AppState initialState() {
+    return AppState((appState) => appState
+      ..products = ListBuilder()
+      ..isLoading = false
+      ..authenticated = false
+      ..user = null);
+  }
+
+  AppState._();
+  factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
+
+  static AppState fromJson(String jsonString) {
+    return serializers.deserializeWith(
+        AppState.serializer, jsonDecode(jsonString));
+  }
+
+  String toJson() {
+    return jsonEncode(serializers.serializeWith(AppState.serializer, this));
   }
 }

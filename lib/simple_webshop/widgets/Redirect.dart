@@ -30,8 +30,11 @@ class _RedirectState extends State<Redirect> {
   void initState() {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       final prefs = await SharedPreferences.getInstance();
+//      prefs.remove("user");
+//      prefs.remove("token");
+
       var user = (prefs.get('user') != null)
-          ? AuthenticatedUser.fromJSON(jsonDecode(prefs.get('user')))
+          ? AuthenticatedUser.fromJson(prefs.get('user'))
           : null;
 
       if (user is AuthenticatedUser) {

@@ -12,7 +12,7 @@ class ProductsCataloguePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelSubscriber<AppState, List<Product>>(
-      converter: (state) => state.products,
+      converter: (state) => state.products.toList(),
       builder: (BuildContext context, dispatcher, List<Product> products) =>
           RefreshIndicator(
             child: GridView.count(

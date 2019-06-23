@@ -11,7 +11,8 @@ class AppBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelSubscriber<AppState, int>(
-      converter: (AppState state) => state.shoppingCart.products.length,
+      converter: (AppState state) =>
+          state.user.shoppingCart.cartProducts.length,
       builder: (context, dispatcher, countShoppingCartItems) =>
           BottomNavigationBar(
               currentIndex: currentPage,

@@ -1,3 +1,6 @@
+import 'package:flutter_app/simple_webshop/reblocs/AuthenticationBloc.dart';
+import 'package:flutter_app/simple_webshop/reblocs/ProductsCatalogueBloc.dart';
+import 'package:flutter_app/simple_webshop/reblocs/ShoppingCartGraphQLBloc.dart';
 import 'package:flutter_app/simple_webshop/reblocs/blocs.dart';
 import 'package:flutter_app/simple_webshop/reblocs/states.dart';
 import 'package:rebloc/rebloc.dart';
@@ -6,6 +9,6 @@ final Store<AppState> store =
     Store<AppState>(initialState: AppState.initialState(), blocs: [
   ProductsCatalogueBloc(),
   ShoppingCartBloc(),
-  ShoppingCartGraphqlBloc(),
+  ShoppingCartGraphQLBloc(),
   AuthenticationBloc()
 ]);

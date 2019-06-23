@@ -1,3 +1,4 @@
+import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
 import 'package:meta/meta.dart';
@@ -10,10 +11,16 @@ class AddProductToCart extends Action {
 }
 
 class PersistAddProductToCart extends Action {
-  final String productId;
   final String shoppingCartId;
+  final String productId;
 
-  PersistAddProductToCart({this.productId, this.shoppingCartId});
+  PersistAddProductToCart({this.shoppingCartId, this.productId});
+}
+
+class UpdateCartProducts extends Action {
+  final List<CartProduct> cartProducts;
+
+  UpdateCartProducts({this.cartProducts});
 }
 
 class PersistRemoveProductFromCart extends Action {

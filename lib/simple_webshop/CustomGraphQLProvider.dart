@@ -12,7 +12,7 @@ final HttpLink _httpLink = HttpLink(
 final AuthLink _authLink = AuthLink(getToken: () async {
   final prefs = await SharedPreferences.getInstance();
   final token = (prefs.get('user') != null)
-      ? 'Bearer ${AuthenticatedUser.fromJSON(jsonDecode(prefs.get('user'))).token}'
+      ? 'Bearer ${jsonDecode(prefs.get('token'))}'
       : '';
   return token;
 });

@@ -30,6 +30,11 @@ dependencies:
   convert:
   graphql_flutter:
   shared_preferences:
+  json_annotation:
+  json_serializable:
+  build_runner:
+  source_gen:
+  built_value_generator:
 
   flutter:
     sdk: flutter
