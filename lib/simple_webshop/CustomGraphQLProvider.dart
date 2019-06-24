@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,8 +10,8 @@ final HttpLink _httpLink = HttpLink(
 
 final AuthLink _authLink = AuthLink(getToken: () async {
   final prefs = await SharedPreferences.getInstance();
-  final token = (prefs.get('user') != null)
-      ? 'Bearer ${jsonDecode(prefs.get('token'))}'
+  final token = (await prefs.get('token') != null)
+      ? 'Bearer ${jsonDecode(await prefs.get('token'))}'
       : '';
   return token;
 });

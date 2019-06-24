@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
-import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
-import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AuthenticationActions.dart';
+import 'package:flutter_app/simple_webshop/reblocs/ShoppingCartActions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/store.dart';
 import 'package:rebloc/rebloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';

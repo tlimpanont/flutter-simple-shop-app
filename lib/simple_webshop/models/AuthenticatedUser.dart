@@ -9,11 +9,8 @@ part 'AuthenticatedUser.g.dart';
 
 abstract class AuthenticatedUser
     implements Built<AuthenticatedUser, AuthenticatedUserBuilder> {
-  @nullable
   String get email;
-  @nullable
   String get name;
-  @nullable
   String get id;
   @nullable
   ShoppingCart get shoppingCart;

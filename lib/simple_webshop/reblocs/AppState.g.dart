@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'states.dart';
+part of 'AppState.dart';
 
 // **************************************************************************
 // BuiltValueGenerator

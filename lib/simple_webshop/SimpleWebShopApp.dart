@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
 import 'package:flutter_app/simple_webshop/pages/LoginPage.dart';
-import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
-import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
+import 'package:flutter_app/simple_webshop/reblocs/ProductCatalogueActions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/store.dart';
 import 'package:flutter_app/simple_webshop/widgets/AppBottomNavigationBar.dart';
 import 'package:flutter_app/simple_webshop/widgets/AppDrawer.dart';

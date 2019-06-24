@@ -19,25 +19,15 @@ class _$AuthenticatedUserSerializer
   @override
   Iterable serialize(Serializers serializers, AuthenticatedUser object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[];
-    if (object.email != null) {
-      result
-        ..add('email')
-        ..add(serializers.serialize(object.email,
-            specifiedType: const FullType(String)));
-    }
-    if (object.name != null) {
-      result
-        ..add('name')
-        ..add(serializers.serialize(object.name,
-            specifiedType: const FullType(String)));
-    }
-    if (object.id != null) {
-      result
-        ..add('id')
-        ..add(serializers.serialize(object.id,
-            specifiedType: const FullType(String)));
-    }
+    final result = <Object>[
+      'email',
+      serializers.serialize(object.email,
+          specifiedType: const FullType(String)),
+      'name',
+      serializers.serialize(object.name, specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+    ];
     if (object.shoppingCart != null) {
       result
         ..add('shoppingCart')
@@ -96,7 +86,17 @@ class _$AuthenticatedUser extends AuthenticatedUser {
       (new AuthenticatedUserBuilder()..update(updates)).build();
 
   _$AuthenticatedUser._({this.email, this.name, this.id, this.shoppingCart})
-      : super._();
+      : super._() {
+    if (email == null) {
+      throw new BuiltValueNullFieldError('AuthenticatedUser', 'email');
+    }
+    if (name == null) {
+      throw new BuiltValueNullFieldError('AuthenticatedUser', 'name');
+    }
+    if (id == null) {
+      throw new BuiltValueNullFieldError('AuthenticatedUser', 'id');
+    }
+  }
 
   @override
   AuthenticatedUser rebuild(void Function(AuthenticatedUserBuilder) updates) =>

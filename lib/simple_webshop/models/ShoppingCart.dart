@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
 import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
 import 'package:flutter_app/simple_webshop/serializers.dart';
 
@@ -15,8 +14,6 @@ abstract class ShoppingCart
   String get id;
   @nullable
   BuiltList<CartProduct> get cartProducts;
-
-  @nullable
   double get totalPrice => cartProducts.fold(
       0,
       (double curr, CartProduct cartProduct) =>

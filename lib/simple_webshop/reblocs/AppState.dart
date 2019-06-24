@@ -7,7 +7,7 @@ import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/serializers.dart';
 
-part 'states.g.dart';
+part 'AppState.g.dart';
 
 abstract class AppState implements Built<AppState, AppStateBuilder> {
   BuiltList<Product> get products;

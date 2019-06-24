@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
+import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
-import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
-import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AuthenticationActions.dart';
+import 'package:flutter_app/simple_webshop/reblocs/ShoppingCartActions.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:rebloc/rebloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +19,7 @@ class AuthenticationBloc extends Bloc<AppState> {
 
       if (context.action is SignInUser) {
         final credentials = (context.action as SignInUser);
-        QueryResult result = await graphQLClient.query(QueryOptions(
+        final QueryResult result = await graphQLClient.query(QueryOptions(
             document: """
             mutation signinUser(\$email: String!, \$password:String!) {
               signinUser(email: {email:\$email, password: \$password}) {
@@ -47,16 +49,57 @@ class AuthenticationBloc extends Bloc<AppState> {
               'email': credentials.email,
               'password': credentials.password,
             }));
-        final user = AuthenticatedUser.fromJson(
-            jsonEncode(result.data['signinUser']['user']));
-
-        await prefs.setString(
-            'token', jsonEncode(result.data['signinUser']['token']));
-        await prefs.setString(
-            'user', jsonEncode(result.data['signinUser']['user']));
-
-        context.dispatcher(UserIsAuthenticated(user));
-      } else if (context.action is SignOutUser) {}
+        if (result.data['signinUser']['user']['shoppingCart'] != null) {
+          final user = AuthenticatedUser.fromJson(
+              jsonEncode(result.data['signinUser']['user']));
+          await prefs.setString(
+              'token', jsonEncode(result.data['signinUser']['token']));
+          await prefs.setString('user', user.toJson());
+          context.dispatcher(UserIsAuthenticated(user));
+          context.dispatcher(FetchShoppingCartProducts(user.id));
+          navigationKey.currentState.pushReplacementNamed("/shop");
+        } else {
+          final QueryResult _result = await graphQLClient.query(QueryOptions(
+              document: """ 
+              mutation createShoppingCart(\$userId:ID!) {
+                createShoppingCart(userId:\$userId) {
+                  id
+                    user {
+                    id
+                    email
+                    name
+                    shoppingCart {
+                      id
+                      cartProducts {
+                        id
+                        product {
+                          id
+                          image
+                          price
+                          title
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+          """,
+              fetchPolicy: FetchPolicy.noCache,
+              variables: {'userId': result.data['signinUser']['user']['id']}));
+          final user = AuthenticatedUser.fromJson(
+              jsonEncode(_result.data['createShoppingCart']['user']));
+          await prefs.setString(
+              'token', jsonEncode(result.data['signinUser']['token']));
+          await prefs.setString('user', user.toJson());
+          navigationKey.currentState.pushReplacementNamed("/shop");
+          context.dispatcher(UserIsAuthenticated(user));
+        }
+      } else if (context.action is SignOutUser) {
+        await prefs.remove("token");
+        await prefs.remove("user");
+        navigationKey.currentState.pushReplacementNamed("/login");
+        context.dispatcher(UserIsUnAuthenticated());
+      }
     });
     return input;
   }
@@ -79,6 +122,9 @@ class AuthenticationBloc extends Bloc<AppState> {
               ..authenticated = true
               ..user = ((accumulator.action as UserIsAuthenticated).user)
                   .toBuilder()));
+      } else if (accumulator.action is UserIsUnAuthenticated) {
+        return Accumulator(accumulator.action,
+            accumulator.state.rebuild(((b) => AppState.initialState())));
       }
       return accumulator;
     });

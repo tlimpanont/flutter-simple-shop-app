@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
 import 'package:rebloc/rebloc.dart';
 
 class AppBottomNavigationBar extends StatelessWidget {

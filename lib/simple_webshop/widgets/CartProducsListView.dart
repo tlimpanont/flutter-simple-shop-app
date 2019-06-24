@@ -30,7 +30,7 @@ class CartProductsListView extends StatelessWidget {
               Scaffold.of(context).showSnackBar(SnackBar(
                   content:
                       Text('Product: ${cartProduct.product.title} deleted')));
-              onDeleteItem(cartProduct.product);
+              onDeleteItem(cartProduct);
             }),
       );
     }).toList(growable: true);

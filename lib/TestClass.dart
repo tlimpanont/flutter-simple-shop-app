@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
-import 'package:flutter_app/simple_webshop/models/Product.dart';
-import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
 
 import 'simple_webshop/models/CartProduct.dart';
 

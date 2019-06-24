@@ -11,7 +11,7 @@ import 'package:flutter_app/simple_webshop/models/AuthenticatedUser.dart';
 import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
 import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
-import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
 
 part 'serializers.g.dart';
 

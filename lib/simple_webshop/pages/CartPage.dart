@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/simple_webshop/models/Product.dart';
+import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
 import 'package:flutter_app/simple_webshop/models/ShoppingCart.dart';
-import 'package:flutter_app/simple_webshop/reblocs/actions.dart';
-import 'package:flutter_app/simple_webshop/reblocs/states.dart';
+import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
+import 'package:flutter_app/simple_webshop/reblocs/ShoppingCartActions.dart';
 import 'package:flutter_app/simple_webshop/widgets/CartProducsListView.dart';
 import 'package:flutter_app/simple_webshop/widgets/EmptyStateIconLabel.dart';
 import 'package:rebloc/rebloc.dart';
@@ -21,9 +21,9 @@ class CartPage extends StatelessWidget {
                 )
               : CartProductsListView(
                   shoppingCart: shoppingCart,
-                  onDeleteItem: (Product product) => dispatcher(
+                  onDeleteItem: (CartProduct cartProduct) => dispatcher(
                       PersistRemoveProductFromCart(
-                          productId: product.id,
+                          cartProductId: cartProduct.id,
                           shoppingCartId: shoppingCart.id)),
                 );
         },
