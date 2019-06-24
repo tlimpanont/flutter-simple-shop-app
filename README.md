@@ -22,7 +22,7 @@ https://www.didierboelens.com/2019/04/bloc---scopedmodel---redux---comparison/
 - Remove Product from Cart
 ```
 
-<a href="http://recordit.co/XTUvKIQ2R9" target="_BLANK"><img src="https://i.snag.gy/1CceyQ.jpg" /></a>
+<a href="http://recordit.co/XTUvKIQ2R9" target="_BLANK"><img src="https://i.snag.gy/Hl6ktq.jpg" /></a>
 
 ```
 - Login
@@ -32,6 +32,6 @@ https://www.didierboelens.com/2019/04/bloc---scopedmodel---redux---comparison/
 - Logout
 ```
 
-<a href="http://recordit.co/XTUvKIQ2R9" target="_BLANK"><img src="https://i.snag.gy/1CceyQ.jpg" /></a>
+<a href="http://recordit.co/ka2btZbj2v" target="_BLANK"><img src="https://i.snag.gy/Xrqepu.jpg" /></a>
 
 
