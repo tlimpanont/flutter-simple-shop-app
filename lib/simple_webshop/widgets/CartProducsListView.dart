@@ -26,10 +26,6 @@ class CartProductsListView extends StatelessWidget {
         trailing: IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
-              Scaffold.of(context).removeCurrentSnackBar();
-              Scaffold.of(context).showSnackBar(SnackBar(
-                  content:
-                      Text('Product: ${cartProduct.product.title} deleted')));
               onDeleteItem(cartProduct);
             }),
       );

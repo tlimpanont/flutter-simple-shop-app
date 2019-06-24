@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_app/simple_webshop/CustomGraphQLProvider.dart';
+import 'package:flutter_app/simple_webshop/SimpleWebShopApp.dart';
 import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
 import 'package:flutter_app/simple_webshop/reblocs/ShoppingCartActions.dart';
 import 'package:flutter_app/simple_webshop/reblocs/AppState.dart';
@@ -90,12 +92,12 @@ class ShoppingCartBloc extends Bloc<AppState> {
       } else if (context.action is PersistRemoveProductFromCart) {
         final shoppingCartId =
             (context.action as PersistRemoveProductFromCart).shoppingCartId;
-        final cartProductId =
-            (context.action as PersistRemoveProductFromCart).cartProductId;
+        final cartProduct =
+            (context.action as PersistRemoveProductFromCart).cartProduct;
 
         final cartProductsIds = context.state.user.shoppingCart.cartProducts
             .map((cartProduct) => cartProduct.id)
-            .where((_cartProductId) => _cartProductId != cartProductId)
+            .where((_cartProductId) => _cartProductId != cartProduct.id)
             .toList();
 
         try {
@@ -121,12 +123,16 @@ class ShoppingCartBloc extends Bloc<AppState> {
                 "shoppingCartId": shoppingCartId
               }));
           if (result.errors == null) {
-            print(result.errors);
             final cartProducts = List<dynamic>.from(
                     result.data['updateShoppingCart']['cartProducts'])
                 .map((cartProduct) {
               return CartProduct.fromJson(jsonEncode(cartProduct));
             });
+
+            shopScaffoldKey.currentState.removeCurrentSnackBar();
+            shopScaffoldKey.currentState.showSnackBar(SnackBar(
+                content:
+                    Text('Product: ${cartProduct.product.title} deleted')));
 
             context.dispatcher(
                 UpdateCartProducts(cartProducts: cartProducts.toList()));

@@ -23,7 +23,7 @@ class CartPage extends StatelessWidget {
                   shoppingCart: shoppingCart,
                   onDeleteItem: (CartProduct cartProduct) => dispatcher(
                       PersistRemoveProductFromCart(
-                          cartProductId: cartProduct.id,
+                          cartProduct: cartProduct,
                           shoppingCartId: shoppingCart.id)),
                 );
         },

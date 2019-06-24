@@ -18,8 +18,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
   Iterable serialize(Serializers serializers, Product object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object>[
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
       'image',
       serializers.serialize(object.image,
           specifiedType: const FullType(String)),
@@ -30,7 +28,12 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       serializers.serialize(object.price,
           specifiedType: const FullType(double)),
     ];
-
+    if (object.id != null) {
+      result
+        ..add('id')
+        ..add(serializers.serialize(object.id,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -82,9 +85,6 @@ class _$Product extends Product {
       (new ProductBuilder()..update(updates)).build();
 
   _$Product._({this.id, this.image, this.title, this.price}) : super._() {
-    if (id == null) {
-      throw new BuiltValueNullFieldError('Product', 'id');
-    }
     if (image == null) {
       throw new BuiltValueNullFieldError('Product', 'image');
     }

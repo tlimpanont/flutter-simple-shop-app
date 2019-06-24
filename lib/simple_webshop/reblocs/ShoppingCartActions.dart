@@ -9,10 +9,10 @@ class PersistAddProductToCart extends Action {
 }
 
 class PersistRemoveProductFromCart extends Action {
-  final String cartProductId;
+  final CartProduct cartProduct;
   final String shoppingCartId;
 
-  PersistRemoveProductFromCart({this.cartProductId, this.shoppingCartId});
+  PersistRemoveProductFromCart({this.cartProduct, this.shoppingCartId});
 }
 
 class UpdateCartProducts extends Action {

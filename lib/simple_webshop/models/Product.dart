@@ -10,6 +10,7 @@ part 'Product.g.dart';
 final currencyFormatter = new NumberFormat.simpleCurrency(locale: 'nl-NL');
 
 abstract class Product implements Built<Product, ProductBuilder> {
+  @nullable
   String get id;
   String get image;
   String get title;
