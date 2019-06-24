@@ -1,16 +1,37 @@
-# flutter_app
+### Material Components Widget
 
-A new Flutter application.
+https://flutter.dev/docs/development/ui/widgets/material
 
-## Getting Started
+### JSON (De)Serialization and Immutable Objects
+https://github.com/google/built_value.dart
 
-This project is a starting point for a Flutter application.
+### State Management Rebloc (combination of BLoC and Redux pattern)
 
-A few resources to get you started if this is your first Flutter project:
+https://pub.dev/packages/rebloc
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### BLoC - ScopedModel - Redux - Comparison 
+https://www.didierboelens.com/2019/04/bloc---scopedmodel---redux---comparison/
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+# Demo
+
+```
+- View Product Detail
+
+- Add Product to Cart
+
+- Remove Product from Cart
+```
+
+<a href="http://recordit.co/XTUvKIQ2R9" target="_BLANK"><img src="https://i.snag.gy/1CceyQ.jpg" /></a>
+
+```
+- Login
+
+- Fetch and Add Random New Product
+
+- Logout
+```
+
+<a href="http://recordit.co/ka2btZbj2v" target="_BLANK"><img src="https://i.snag.gy/tqf0N1.jpg" /></a>
+
+
