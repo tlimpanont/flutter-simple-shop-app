@@ -60,8 +60,7 @@ class AddProductPage extends StatelessWidget {
                                 onPressed: () {
                                   dispatcher(PersistAddProductToCart(
                                       shoppingCartId: shoppingCart.id,
-                                      productId: product.id));
-                                  _navigateAndDisplayProduct(context, product);
+                                      product: product));
                                 },
                                 child: Text('Add to cart'.toUpperCase()),
                                 color: Theme.of(context).accentColor,
@@ -80,12 +79,5 @@ class AddProductPage extends StatelessWidget {
         );
       },
     );
-  }
-
-  void _navigateAndDisplayProduct(BuildContext context, Product product) async {
-    Navigator.pop(context, product);
-    shopScaffoldKey.currentState.removeCurrentSnackBar();
-    shopScaffoldKey.currentState.showSnackBar(
-        new SnackBar(content: new Text("Product: ${product.title} added")));
   }
 }

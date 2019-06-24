@@ -1,11 +1,12 @@
 import 'package:flutter_app/simple_webshop/models/CartProduct.dart';
+import 'package:flutter_app/simple_webshop/models/Product.dart';
 import 'package:rebloc/rebloc.dart';
 
 class PersistAddProductToCart extends Action {
   final String shoppingCartId;
-  final String productId;
+  final Product product;
 
-  PersistAddProductToCart({this.shoppingCartId, this.productId});
+  PersistAddProductToCart({this.shoppingCartId, this.product});
 }
 
 class PersistRemoveProductFromCart extends Action {

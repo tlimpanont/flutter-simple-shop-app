@@ -50,12 +50,12 @@ class ShoppingCartBloc extends Bloc<AppState> {
       } else if (context.action is PersistAddProductToCart) {
         final shoppingCartId =
             (context.action as PersistAddProductToCart).shoppingCartId;
-        final productId = (context.action as PersistAddProductToCart).productId;
+        final product = (context.action as PersistAddProductToCart).product;
         final List<String> productIds = context
             .state.user.shoppingCart.cartProducts
             .map((cartProduct) => cartProduct.product.id)
             .toList(growable: true)
-              ..add(productId);
+              ..add(product.id);
 
         final result = await graphQLClient.mutate(MutationOptions(
             document: """
@@ -86,6 +86,11 @@ class ShoppingCartBloc extends Bloc<AppState> {
             .map((cartProduct) {
           return CartProduct.fromJson(jsonEncode(cartProduct));
         });
+
+        navigationKey.currentState.pop();
+        shopScaffoldKey.currentState.removeCurrentSnackBar();
+        shopScaffoldKey.currentState.showSnackBar(
+            new SnackBar(content: new Text("Product: ${product.title} added")));
 
         context.dispatcher(
             UpdateCartProducts(cartProducts: cartProducts.toList()));
